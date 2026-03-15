@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REPORTS_DIR = 'reports'
-        # Ajouter ~/.local/bin au PATH pour pip-audit
+        // Ajouter ~/.local/bin au PATH pour pip-audit
         PATH = "${env.HOME}/.local/bin:${env.PATH}"
     }
 
@@ -51,10 +51,8 @@ pipeline {
         always {
             echo '📄 Archivage du rapport SCA pip-audit...'
 
-            // Archiver le rapport pour téléchargement
             archiveArtifacts artifacts: '${REPORTS_DIR}/pip_audit_report.html', allowEmptyArchive: true
 
-            // Publier le rapport HTML pour visualisation dans Jenkins
             publishHTML(target: [
                 reportDir: "${REPORTS_DIR}",
                 reportFiles: 'pip_audit_report.html',
