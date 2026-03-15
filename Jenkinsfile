@@ -5,13 +5,13 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                echo 'Cloning repository'
+                git 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-Security.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh 'pip3 install -r requirements.txt --break-system-packages'
             }
         }
 
@@ -20,5 +20,6 @@ pipeline {
                 sh 'pytest'
             }
         }
+
     }
 }
