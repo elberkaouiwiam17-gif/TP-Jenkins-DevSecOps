@@ -34,7 +34,7 @@ pipeline {
 
                     echo "pip-audit exit code: ${pip_audit_status}"
 
-                    // Afficher résumé des vulnérabilités
+                    // Résumé des vulnérabilités
                     sh """
                     echo 'Résumé des vulnérabilités pip-audit:'
                     python3 - <<EOF
@@ -74,22 +74,24 @@ EOF
             }
         }
 
-      stage('SAST Scan') {
-    steps {
-        script {
-            def scannerHome = tool 'sonar-scanner'
-            withSonarQubeEnv('MySonarQubeServer') {
-                sh """
-                ${scannerHome}/bin/sonar-scanner \
-                -Dsonar.projectKey=TP-Jenkins \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=$SONAR_HOST_URL \
-                -Dsonar.login=$SONAR_AUTH_TOKEN
-                """
+        stage('SAST Scan') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonar-scanner'
+                    withSonarQubeEnv('MySonarQubeServer') {
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=TP-Jenkins \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                        """
+                    }
+                }
             }
         }
-    }
-}
+
+    }   // ← fermeture correcte de stages
 
     post {
 
