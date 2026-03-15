@@ -20,6 +20,15 @@ pipeline {
                 sh 'pytest'
             }
         }
+
+        stage('SAST Scan') {
+    steps {
+        withSonarQubeEnv('MySonarQubeServer') { // Nom du serveur configuré
+            sh 'sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=.'
+        }
     }
+}
+    }
+    
     }
 
