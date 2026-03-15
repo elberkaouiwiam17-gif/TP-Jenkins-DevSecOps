@@ -26,8 +26,8 @@ pipeline {
                 # Créer le dossier pour les rapports
                 mkdir -p ${REPORTS_DIR}
 
-                # Lancer le scan SCA et générer le rapport HTML
-                pip-audit --format html --output ${REPORTS_DIR}/pip_audit_report.html
+                # Lancer le scan SCA et générer le rapport JSON
+                pip-audit --format json --output ${REPORTS_DIR}/pip_audit_report.json
                 '''
             }
         }
@@ -51,15 +51,11 @@ pipeline {
         always {
             echo '📄 Archivage du rapport SCA pip-audit...'
 
-            archiveArtifacts artifacts: '${REPORTS_DIR}/pip_audit_report.html', allowEmptyArchive: true
+            // Archiver le rapport JSON pour téléchargement
+            archiveArtifacts artifacts: '${REPORTS_DIR}/pip_audit_report.json', allowEmptyArchive: true
 
-            publishHTML(target: [
-                reportDir: "${REPORTS_DIR}",
-                reportFiles: 'pip_audit_report.html',
-                reportName: 'Rapport SCA Python',
-                alwaysLinkToLastBuild: true,
-                keepAll: true
-            ])
+            // Optionnel : publier comme HTML en convertissant JSON → tableau lisible via script
+            // publishHTML(...) si tu ajoutes un convertisseur
         }
 
         success {
