@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         REPORTS_DIR = 'reports'
-        // Ajouter ~/.local/bin au PATH pour pip-audit
-        PATH = "${env.HOME}/.local/bin:${env.PATH}"
     }
 
     stages {
@@ -18,16 +16,16 @@ pipeline {
             steps {
                 sh '''
                 # Installer les dépendances Python
-                pip3 install --break-system-packages -r requirements.txt
+                python3 -m pip install --break-system-packages -r requirements.txt
 
-                # Installer pip-audit
-                pip3 install --break-system-packages pip-audit
+                # Installer pip-audit pour l'utilisateur courant
+                python3 -m pip install --break-system-packages --user pip-audit
 
                 # Créer le dossier pour les rapports
                 mkdir -p ${REPORTS_DIR}
 
-                # Lancer le scan SCA et générer le rapport JSON
-                pip-audit --format json --output ${REPORTS_DIR}/pip_audit_report.json
+                # Lancer le scan SCA avec pip-audit et générer le rapport JSON
+                python3 -m pip_audit --format json --output ${REPORTS_DIR}/pip_audit_report.json
                 '''
             }
         }
@@ -51,11 +49,10 @@ pipeline {
         always {
             echo '📄 Archivage du rapport SCA pip-audit...'
 
-            // Archiver le rapport JSON pour téléchargement
+            // Archiver le rapport JSON pour consultation
             archiveArtifacts artifacts: '${REPORTS_DIR}/pip_audit_report.json', allowEmptyArchive: true
 
-            // Optionnel : publier comme HTML en convertissant JSON → tableau lisible via script
-            // publishHTML(...) si tu ajoutes un convertisseur
+            // Optionnel : tu peux ajouter un convertisseur JSON → HTML ici si besoin
         }
 
         success {
