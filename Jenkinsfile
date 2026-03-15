@@ -41,6 +41,12 @@ pipeline {
         archiveArtifacts artifacts: 'reports/dependency-check-report.html', allowEmptyArchive: true
     }
 }
+
+        post {
+    always {
+        dependencyCheckPublisher pattern: 'reports/dependency-check-report.xml', failBuildOnCVSS: 7
+    }
+}
     }
     
     }
