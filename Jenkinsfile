@@ -75,22 +75,19 @@ EOF
         }
 
         stage('SAST Scan') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonar-scanner'
-                    withSonarQubeEnv('sonar-scanner') {
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=TP-Jenkins \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                        """
-                    }
-                }
+    steps {
+        script {
+            // Nom exact de ton serveur SonarQube configuré dans Jenkins
+            withSonarQubeEnv('My SonarQube Server') {
+                sh """
+                sonar-scanner \
+                -Dsonar.projectKey=TP-Jenkins \
+                -Dsonar.sources=. 
+                """
             }
         }
-
+    }
+}
     }   // ← fermeture correcte de stages
 
     post {
