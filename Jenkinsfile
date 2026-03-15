@@ -56,7 +56,25 @@ with open('${REPORTS_DIR}/pip_audit_report.json') as f:
             }
         }
 
-       
+        stage('SAST Scan') {
+            steps {
+                withSonarQubeEnv('MySonarQubeServer') {
+                    sh '''
+                    # Activer debug pour voir toutes les commandes et logs
+                    set -x
+
+                    # Vérifier que sonar-scanner est installé
+                    sonar-scanner -v
+
+                    # Lancer l'analyse SonarQube
+                    sonar-scanner \
+                      -Dsonar.projectKey=TP-Jenkins \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
+                }
+            }
         }
     }
 
