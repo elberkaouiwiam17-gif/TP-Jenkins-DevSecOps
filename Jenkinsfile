@@ -12,33 +12,20 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies & SCA Scan') {
             steps {
-                sh 'pip3 install -r requirements.txt --break-system-packages'
-           sh 'pip-audit --format html --output reports/pip_audit_report.html'
- 
+                sh '''
+                pip3 install --break-system-packages -r requirements.txt
+                pip3 install --break-system-packages pip-audit
+                mkdir -p ${REPORTS_DIR}
+                pip-audit --format html --output ${REPORTS_DIR}/pip_audit_report.html
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
                 sh 'pytest'
-            }
-        }
-
-        stage('SCA Scan') {
-            steps {
-                sh '''
-                mkdir -p ${REPORTS_DIR}
-                docker run --rm \
-                  -v $PWD:/src \
-                  owasp/dependency-check \
-                  --project "TP-Jenkins" \
-                  --scan /src \
-                  --format HTML \
-                  --out /src/${REPORTS_DIR}
-                '''
-                archiveArtifacts artifacts: '${REPORTS_DIR}/dependency-check-report.html', allowEmptyArchive: true
             }
         }
 
