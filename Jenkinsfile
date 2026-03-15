@@ -28,6 +28,19 @@ pipeline {
         }
     }
 }
+
+        stage('SCA Scan') {
+    steps {
+        sh '''
+        dependency-check.sh --project "TP-Jenkins" \
+                            --scan . \
+                            --format HTML \
+                            --out reports
+        '''
+        // Archive le rapport pour consultation depuis Jenkins
+        archiveArtifacts artifacts: 'reports/dependency-check-report.html', allowEmptyArchive: true
+    }
+}
     }
     
     }
