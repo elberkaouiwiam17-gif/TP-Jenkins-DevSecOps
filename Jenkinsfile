@@ -3,8 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git'
-            }
+               checkout scm  }
         }
         stage('Install Dependencies') {
             steps {
