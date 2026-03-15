@@ -5,8 +5,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git'
-            }
+               git branch: 'main', url: 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git'  }
         }
 
         stage('Install Dependencies') {
