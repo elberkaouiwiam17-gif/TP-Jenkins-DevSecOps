@@ -74,7 +74,7 @@ EOF
             }
         }
 
-       stage('SAST Scan') {
+      stage('SAST Scan') {
     steps {
         script {
             def scannerHome = tool 'sonar-scanner'
@@ -90,7 +90,6 @@ EOF
         }
     }
 }
-    }
 
     post {
 
