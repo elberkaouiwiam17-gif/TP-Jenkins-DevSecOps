@@ -17,8 +17,10 @@ pipeline {
                 script {
                     // Installer les dépendances Python
                     sh 'python3 -m pip install --break-system-packages -r requirements.txt'
+
                     // Installer pip-audit pour l'utilisateur courant
                     sh 'python3 -m pip install --break-system-packages --user pip-audit'
+
                     // Créer le dossier pour les rapports
                     sh "mkdir -p ${REPORTS_DIR}"
 
@@ -29,7 +31,7 @@ pipeline {
                     )
                     echo "🔎 pip-audit exit code: ${pip_audit_status}"
 
-                    // Lire un résumé simple des vulnérabilités
+                    // Afficher un résumé simple des vulnérabilités dans la console
                     sh """
                     echo '📄 Résumé des vulnérabilités pip-audit:'
                     python3 -c \"
@@ -57,7 +59,20 @@ with open('${REPORTS_DIR}/pip_audit_report.json') as f:
         stage('SAST Scan') {
             steps {
                 withSonarQubeEnv('MySonarQubeServer') {
-                    sh 'sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=.'
+                    sh '''
+                    # Activer debug pour voir toutes les commandes et logs
+                    set -x
+
+                    # Vérifier que sonar-scanner est installé
+                    sonar-scanner -v
+
+                    # Lancer l'analyse SonarQube
+                    sonar-scanner \
+                      -Dsonar.projectKey=TP-Jenkins \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
                 }
             }
         }
