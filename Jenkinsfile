@@ -74,23 +74,22 @@ EOF
             }
         }
 
-        stage('SAST Scan') {
-            steps {
-                withSonarQubeEnv('MySonarQubeServer') {
-                    sh '''
-                        set -x
-
-                        sonar-scanner -v
-
-                        sonar-scanner \
-                        -Dsonar.projectKey=TP-Jenkins \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
-                }
+       stage('SAST Scan') {
+    steps {
+        script {
+            def scannerHome = tool 'sonar-scanner'
+            withSonarQubeEnv('MySonarQubeServer') {
+                sh """
+                ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=TP-Jenkins \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=$SONAR_HOST_URL \
+                -Dsonar.login=$SONAR_AUTH_TOKEN
+                """
             }
         }
+    }
+}
     }
 
     post {
