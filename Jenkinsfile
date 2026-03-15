@@ -22,7 +22,7 @@ pipeline {
         }
 stage('SCA Scan') {
             steps {
-                sh 'dependency-check.sh --project "TP-Jenkins" --scan . --format HTML'
+                sh 'dependency-check.sh --project "TP-Jenkins-DevSecOps" --scan . --format HTML'
             }
         }
         stage('SAST Scan') {
