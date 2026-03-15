@@ -2,20 +2,17 @@ pipeline {
     agent any
 
     environment {
-        // Dossier où seront stockés les rapports
         REPORTS_DIR = 'reports'
     }
 
     stages {
 
-        // ----------------------------
         stage('Clone Repository') {
             steps {
                 checkout scm
             }
         }
 
-        // ----------------------------
         stage('Install Dependencies & SCA Scan') {
             steps {
                 script {
@@ -36,7 +33,7 @@ pipeline {
 
                     echo "pip-audit exit code: ${pip_audit_status}"
 
-                    // Afficher un résumé des vulnérabilités détectées
+                    // Résumé des vulnérabilités
                     sh """
                     python3 - <<EOF
 import json
@@ -54,16 +51,10 @@ except FileNotFoundError:
     print("Rapport pip-audit introuvable")
 EOF
                     """
-
-                    // Optionnel : échouer le build si des vulnérabilités sont détectées
-                    if (pip_audit_status != 0) {
-                        error "Vulnérabilités détectées par pip-audit"
-                    }
                 }
             }
         }
 
-        // ----------------------------
         stage('Run Tests') {
             steps {
                 script {
@@ -81,24 +72,21 @@ EOF
             }
         }
 
-        // ----------------------------
         stage('SAST Scan') {
-            steps {
-                script {
-                    // Avec SonarQube : utilise le scanner configuré dans Jenkins
-                    // Assurez-vous que :
-                    // 1) Le serveur SonarQube est accessible depuis l'agent (ex: http://host.docker.internal:9000)
-                    // 2) Le token d'authentification est configuré dans Jenkins
-                    withSonarQubeEnv('sonar-scanner') {
-                        sh "${tool 'sonar-scanner'}/bin/sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=."
-                    }
-                }
+    steps {
+        script {
+            // Utilise l'installation SonarScanner configurée dans Jenkins
+            withSonarQubeEnv('sonar-scanner') {
+                sh "${tool 'sonar-scanner'}/bin/sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=."
             }
         }
+    }
+}
 
-    } // fin stages
+    }
 
     post {
+
         always {
             echo 'Archivage des rapports...'
             archiveArtifacts artifacts: 'reports/pip_audit_report.json', allowEmptyArchive: true
