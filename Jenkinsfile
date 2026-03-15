@@ -78,7 +78,7 @@ EOF
             steps {
                 script {
                     def scannerHome = tool 'sonar-scanner'
-                    withSonarQubeEnv('MySonarQubeServer') {
+                    withSonarQubeEnv('sonar-scanner') {
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=TP-Jenkins \
