@@ -3,9 +3,12 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout Repository') {
             steps {
-               git branch: 'main', url: 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git'  }
+                git branch: 'main',
+                    url: 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git',
+                    gitTool: 'GitLatest'
+            }
         }
 
         stage('Install Dependencies') {
