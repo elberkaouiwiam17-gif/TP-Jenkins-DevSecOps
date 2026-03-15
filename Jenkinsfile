@@ -3,13 +3,11 @@ pipeline {
 
     stages {
 
-        stage('Checkout Repository') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/elberkaouiwiam17-gif/TP-Jenkins-DevSecOps.git',
-                    gitTool: 'GitLatest'
-            }
-        }
+       stage('Checkout Repository') {
+    steps {
+        checkout scm
+    }
+}
 
         stage('Install Dependencies') {
             steps {
