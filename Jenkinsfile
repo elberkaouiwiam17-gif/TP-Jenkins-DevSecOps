@@ -15,6 +15,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'pip3 install -r requirements.txt --break-system-packages'
+           sh 'pip-audit --format html --output reports/pip_audit_report.html'
+ 
             }
         }
 
