@@ -1,26 +1,45 @@
 pipeline {
     agent any
+
+    environment {
+        REPORTS_DIR = 'reports'
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-               checkout scm  }
+                checkout scm
+            }
         }
+
         stage('Install Dependencies') {
             steps {
                 sh 'pip3 install -r requirements.txt --break-system-packages'
             }
         }
+
         stage('Run Tests') {
             steps {
                 sh 'pytest'
             }
         }
+
         stage('SCA Scan') {
             steps {
-                sh 'dependency-check.sh --project "TP-Jenkins" --scan . --format HTML --out reports'
-                archiveArtifacts artifacts: 'reports/dependency-check-report.html', allowEmptyArchive: true
+                sh '''
+                mkdir -p ${REPORTS_DIR}
+                docker run --rm \
+                  -v $PWD:/src \
+                  owasp/dependency-check \
+                  --project "TP-Jenkins" \
+                  --scan /src \
+                  --format HTML \
+                  --out /src/${REPORTS_DIR}
+                '''
+                archiveArtifacts artifacts: '${REPORTS_DIR}/dependency-check-report.html', allowEmptyArchive: true
             }
         }
+
         stage('SAST Scan') {
             steps {
                 withSonarQubeEnv('MySonarQubeServer') {
@@ -28,10 +47,14 @@ pipeline {
                 }
             }
         }
-    } // <-- fin de stages
-    post {   // <-- post doit être ici, PAS à l'intérieur d'un stage
+    }
+
+    post {
+        success {
+            echo '✅ Build succeeded! Tous les tests et scans ont été exécutés.'
+        }
         failure {
-            echo 'Build failed due to errors or vulnerabilities'
+            echo '❌ Build failed! Vérifiez les tests ou les vulnérabilités détectées.'
         }
     }
 }
