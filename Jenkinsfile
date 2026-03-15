@@ -16,7 +16,6 @@ pipeline {
         stage('Install Dependencies & SCA Scan') {
             steps {
                 script {
-
                     // Installer les dépendances Python
                     sh 'python3 -m pip install --break-system-packages -r requirements.txt'
 
@@ -36,7 +35,6 @@ pipeline {
 
                     // Résumé des vulnérabilités
                     sh """
-                    echo 'Résumé des vulnérabilités pip-audit:'
                     python3 - <<EOF
 import json
 try:
@@ -44,11 +42,12 @@ try:
         data = json.load(f)
         vulns = data.get("vulnerabilities", [])
         if vulns:
+            print("Vulnérabilités détectées:")
             for v in vulns:
-                print(f"- {v.get('package')} : {v.get('id')}")
+                print(f"- {v.get('package')} : {v.get('id')} ({v.get('fix_version')})")
         else:
             print("Aucune vulnérabilité détectée")
-except:
+except FileNotFoundError:
     print("Rapport pip-audit introuvable")
 EOF
                     """
@@ -59,7 +58,6 @@ EOF
         stage('Run Tests') {
             steps {
                 script {
-
                     def test_status = sh(
                         script: "pytest --maxfail=5 --tb=short",
                         returnStatus: true
@@ -75,26 +73,22 @@ EOF
         }
 
         stage('SAST Scan') {
-    steps {
-        script {
-            // Nom exact de ton serveur SonarQube configuré dans Jenkins
-            withSonarQubeEnv('My SonarQube Server') {
-                sh """
-                sonar-scanner \
-                -Dsonar.projectKey=TP-Jenkins \
-                -Dsonar.sources=. 
-                """
+            steps {
+                script {
+                    // Nom exact de l'installation SonarQube dans Jenkins
+                    withSonarQubeEnv('sonar-scanner') {
+                        sh 'sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=.'
+                    }
+                }
             }
         }
+
     }
-}
-    }   // ← fermeture correcte de stages
 
     post {
 
         always {
             echo 'Archivage des rapports...'
-
             archiveArtifacts artifacts: 'reports/pip_audit_report.json', allowEmptyArchive: true
             archiveArtifacts artifacts: '**/reports/*.xml', allowEmptyArchive: true
         }
