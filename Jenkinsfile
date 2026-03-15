@@ -73,15 +73,15 @@ EOF
         }
 
         stage('SAST Scan') {
-            steps {
-                script {
-                    // Nom exact de l'installation SonarQube dans Jenkins
-                    withSonarQubeEnv('sonar-scanner') {
-                        sh 'sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=.'
-                    }
-                }
+    steps {
+        script {
+            // Utilise l'installation SonarScanner configurée dans Jenkins
+            withSonarQubeEnv('sonar-scanner') {
+                sh "${tool 'sonar-scanner'}/bin/sonar-scanner -Dsonar.projectKey=TP-Jenkins -Dsonar.sources=."
             }
         }
+    }
+}
 
     }
 
