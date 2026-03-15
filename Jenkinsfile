@@ -3,11 +3,12 @@ pipeline {
 
     stages {
 
-       stage('Checkout Repository') {
-    steps {
-        checkout scm
-    }
-}
+        stage('Checkout Repository') {
+            steps {
+                // clone depuis le repo configuré dans le job
+                checkout scm
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
@@ -20,21 +21,24 @@ pipeline {
                 sh 'pytest'
             }
         }
-stage('SCA Scan') {
+
+        stage('SCA Scan') {
             steps {
+                // Assure-toi que dependency-check.sh est dans le PATH
                 sh 'dependency-check.sh --project "TP-Jenkins-DevSecOps" --scan . --format HTML'
             }
         }
+
         stage('SAST Scan') {
             steps {
                 sh 'sonar-scanner'
             }
         }
     }
+
     post {
         failure {
             echo 'Build failed due to errors or vulnerabilities'
         }
-    }
     }
 }
